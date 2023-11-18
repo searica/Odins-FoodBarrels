@@ -9,7 +9,7 @@ using PieceManager;
 using ServerSync;
 using UnityEngine;
 using LocalizationManager;
-
+using BepInEx.Logging;
 
 namespace OdinsFoodBarrels
 {
@@ -25,8 +25,6 @@ namespace OdinsFoodBarrels
         private static string ConfigFileName = HGUIDLower + ".cfg";
         private static string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
         public static string ConnectionError = "";
-
-
 
         private static readonly ConfigSync configSync = new(ModName) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
 
@@ -49,6 +47,8 @@ namespace OdinsFoodBarrels
             On = 1,
             Off = 0
         }
+
+        internal static ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource(ModName);
 
         private void Awake()
         {
@@ -138,14 +138,9 @@ namespace OdinsFoodBarrels
             OH_Seedbag.RequiredItems.Add("DeerHide", 5, true);
             OH_Seedbag.Category.Set(BuildPieceCategory.Misc);
 
-
             Assembly assembly = Assembly.GetExecutingAssembly();
             Harmony harmony = new(ModGUID);
             harmony.PatchAll(assembly);
-
-
         }
-
-
     }
 }
