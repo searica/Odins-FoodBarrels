@@ -99,9 +99,20 @@ namespace OdinsFoodBarrels
             OH_Sap_Barrel.RequiredItems.Add("Sap", 50, true);
             CreateBuildPiece(assetBundle, "OH_Seedbag", "DeerHide", 5, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Seedbag = new("odinsnummies", "OH_Seedbag");
-            OH_Seedbag.RequiredItems.Add("DeerHide", 5, true);
-            OH_Seedbag.Category.Set(BuildPieceCategory.Misc);
+            // override the allowable items for OH_Seedbag since we want to it be seeds and not DeerHide
+            ContainerRestrictions["OH_Seedbag"] = new HashSet<string>()
+            {
+                "Acorn",
+                "AncientSeed",
+                "BeechSeeds",
+                "BirchSeeds",
+                "CarrotSeeds",
+                "OnionSeeds",
+                "TurnipSeeds",
+            };
+
+            // Set up restrictions for containers
+            RestrictContainers.Instance.SetContainerRestrictions(ContainerRestrictions);
 
             Assembly assembly = Assembly.GetExecutingAssembly();
             Harmony harmony = new(ModGUID);
