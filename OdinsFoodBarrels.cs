@@ -49,6 +49,9 @@ namespace OdinsFoodBarrels
 
         internal static ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource(ModName);
 
+        private static readonly Dictionary<string, BuildPiece> BuildPieces = new();
+        private static readonly Dictionary<string, HashSet<string>> ContainerRestrictions = new();
+
         private void Awake()
         {
             Localizer.Load();
@@ -140,6 +143,34 @@ namespace OdinsFoodBarrels
             Assembly assembly = Assembly.GetExecutingAssembly();
             Harmony harmony = new(ModGUID);
             harmony.PatchAll(assembly);
+        }
+
+        /// <summary>
+        ///     Method to create food barrels and add values to container restrictions
+        /// </summary>
+        /// <param name="assetBundleFileName"></param>
+        /// <param name="prefabName"></param>
+        /// <param name="requiredItem"></param>
+        /// <param name="itemAmount"></param>
+        /// <param name="recover"></param>
+        /// <param name="category"></param>
+        private static void CreateBuildPiece(
+            string assetBundleFileName,
+            string prefabName,
+            string requiredItem,
+            int itemAmount,
+            bool recover,
+            BuildPieceCategory category
+        )
+        {
+            BuildPiece buildPiece = new(assetBundleFileName, prefabName);
+            buildPiece.RequiredItems.Add(requiredItem, itemAmount, recover);
+            buildPiece.Category.Set(category);
+            BuildPieces.Add(prefabName, buildPiece); // keep a reference to BuildPiece in case PieceManager needs it
+
+            // add tokenized version of prefabName, which is also the name for
+            // it's container component also add the allowable item for this container
+            ContainerRestrictions.Add($"${prefabName}", new HashSet<string>() { requiredItem });
         }
     }
 }
