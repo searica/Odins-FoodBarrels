@@ -47,6 +47,7 @@ namespace OdinsFoodBarrels
             Off = 0
         }
 
+        // Create logger for debug messaging of RestrictContainers
         internal static ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource(ModName);
 
         private const string assetBundle = "odinsnummies";
