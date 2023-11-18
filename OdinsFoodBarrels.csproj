@@ -75,6 +75,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Steam\steamapps\common\Valheim-ptr\BepInEx\core\BepInEx.dll</HintPath>
     </Reference>
+    <Reference Include="LocalizationManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libs\LocalizationManager.dll</HintPath>
+    </Reference>
     <Reference Include="PieceManager">
       <HintPath>Libs\PieceManager.dll</HintPath>
     </Reference>
@@ -122,6 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ILRepack.targets" />
+    <Content Include="Libs\LocalizationManager.dll" />
     <Content Include="Libs\PieceManager.dll" />
     <Content Include="Libs\ServerSync.dll" />
     <Content Include="LICENSE.txt" />
@@ -131,7 +136,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="translations\English.yml" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="assets\odinsnummies">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
