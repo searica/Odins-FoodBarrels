@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
 using BepInEx;
@@ -58,45 +57,45 @@ namespace OdinsFoodBarrels
         {
             Localizer.Load();
 
-            CreateBuildPiece(assetBundle, "OH_Raspberries", "Raspberry", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Raspberries", "Raspberry", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_Blue_Mushrooms", "MushroomBlue", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Blue_Mushrooms", "MushroomBlue", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_Blueberries", "Blueberries", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Blueberries", "Blueberries", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_Carrots", "Carrot", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Carrots", "Carrot", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_CloudBerries", "Cloudberry", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_CloudBerries", "Cloudberry", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_Fish", "FishRaw", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Fish", "FishRaw", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_Honey", "Honey", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Honey", "Honey", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_Red_Mushrooms", "Mushroom", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Red_Mushrooms", "Mushroom", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_Turnips", "Turnip", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Turnips", "Turnip", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_Yellow_Mushrooms", "MushroomYellow", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Yellow_Mushrooms", "MushroomYellow", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_Thistle", "Thistle", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Thistle", "Thistle", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_Dandelion", "Dandelion", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Dandelion", "Dandelion", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_Barley", "Barley", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Barley", "Barley", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_Flax", "Flax", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Flax", "Flax", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_Onions", "Onion", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Onions", "Onion", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_Egg_Basket", "ChickenEgg", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Egg_Basket", "ChickenEgg", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_JotunPuffs_Basket", "MushroomJotunPuffs", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_JotunPuffs_Basket", "MushroomJotunPuffs", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_Magecap", "MushroomMagecap", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Magecap", "MushroomMagecap", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_RoyalJelly", "RoyalJelly", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_RoyalJelly", "RoyalJelly", 10, true, BuildPieceCategory.Misc);
 
-            CreateBuildPiece(assetBundle, "OH_Sap_Barrel", "Sap", 50, true, BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Sap_Barrel", "Sap", 10, true, BuildPieceCategory.Misc);
 
             CreateBuildPiece(assetBundle, "OH_Seedbag", "DeerHide", 5, true, BuildPieceCategory.Misc);
 
