@@ -96,7 +96,7 @@ namespace OdinsFoodBarrels
             CreateBuildPiece(assetBundle, "OH_RoyalJelly", "RoyalJelly", 50, true, BuildPieceCategory.Misc);
 
             CreateBuildPiece(assetBundle, "OH_Sap_Barrel", "Sap", 50, true, BuildPieceCategory.Misc);
-            OH_Sap_Barrel.RequiredItems.Add("Sap", 50, true);
+
             CreateBuildPiece(assetBundle, "OH_Seedbag", "DeerHide", 5, true, BuildPieceCategory.Misc);
 
             // override the allowable items for OH_Seedbag since we want to it be seeds and not DeerHide
