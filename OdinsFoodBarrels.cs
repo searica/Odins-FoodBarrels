@@ -53,6 +53,9 @@ namespace OdinsFoodBarrels
         private static readonly Dictionary<string, BuildPiece> BuildPieces = new();
         private static readonly Dictionary<string, HashSet<string>> ContainerRestrictions = new();
 
+        internal static Localization english = null!;
+
+
         private void Awake()
         {
             Localizer.Load();

@@ -123,6 +123,7 @@
   <ItemGroup>
     <Compile Include="OdinsFoodBarrels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RestrictContainers.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ILRepack.targets" />
@@ -137,7 +138,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="translations\English.yml" />
+    <EmbeddedResource Include="translations\English.yml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="assets\odinsnummies">
