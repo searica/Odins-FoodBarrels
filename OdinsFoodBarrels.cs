@@ -1,15 +1,13 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
+using System.Collections.Generic;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
 using PieceManager;
 using ServerSync;
-using UnityEngine;
 using LocalizationManager;
-
+using BepInEx.Logging;
 
 namespace OdinsFoodBarrels
 {
@@ -22,11 +20,9 @@ namespace OdinsFoodBarrels
         internal const string HGUID = Author + "." + "OdinsFoodBarrels";
         internal const string HGUIDLower = "gravebear.odinsfoodbarrels";
         private const string ModGUID = "Harmony." + Author + "." + ModName;
-        private static string ConfigFileName = HGUIDLower + ".cfg";
-        private static string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
+        private static readonly string ConfigFileName = HGUIDLower + ".cfg";
+        private static readonly string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
         public static string ConnectionError = "";
-
-
 
         private static readonly ConfigSync configSync = new(ModName) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
 
@@ -50,102 +46,105 @@ namespace OdinsFoodBarrels
             Off = 0
         }
 
+        // Create logger for debug messaging of RestrictContainers
+        internal static ManualLogSource Log = BepInEx.Logging.Logger.CreateLogSource(ModName);
+
+        private const string assetBundle = "odinsnummies";
+        private static readonly Dictionary<string, BuildPiece> BuildPieces = new();
+        private static readonly Dictionary<string, HashSet<string>> ContainerRestrictions = new();
+
         private void Awake()
         {
             Localizer.Load();
 
-            BuildPiece OH_Raspberries = new("odinsnummies", "OH_Raspberries");
-            OH_Raspberries.RequiredItems.Add("Raspberry", 50, true);
-            OH_Raspberries.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Raspberries", "Raspberry", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Blue_Mushrooms = new("odinsnummies", "OH_Blue_Mushrooms");
-            OH_Blue_Mushrooms.RequiredItems.Add("MushroomBlue", 50, true);
-            OH_Blue_Mushrooms.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Blue_Mushrooms", "MushroomBlue", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Blueberries = new("odinsnummies", "OH_Blueberries");
-            OH_Blueberries.RequiredItems.Add("Blueberries", 50, true);
-            OH_Blueberries.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Blueberries", "Blueberries", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Carrots = new("odinsnummies", "OH_Carrots");
-            OH_Carrots.RequiredItems.Add("Carrot", 50, true);
-            OH_Carrots.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Carrots", "Carrot", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_CloudBerries = new("odinsnummies", "OH_CloudBerries");
-            OH_CloudBerries.RequiredItems.Add("Cloudberry", 50, true);
-            OH_CloudBerries.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_CloudBerries", "Cloudberry", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Fish = new("odinsnummies", "OH_Fish");
-            OH_Fish.RequiredItems.Add("FishRaw", 50, true);
-            OH_Fish.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Fish", "FishRaw", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Honey = new("odinsnummies", "OH_Honey");
-            OH_Honey.RequiredItems.Add("Honey", 50, true);
-            OH_Honey.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Honey", "Honey", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Red_Mushrooms = new("odinsnummies", "OH_Red_Mushrooms");
-            OH_Red_Mushrooms.RequiredItems.Add("Mushroom", 50, true);
-            OH_Red_Mushrooms.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Red_Mushrooms", "Mushroom", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Turnips = new("odinsnummies", "OH_Turnips");
-            OH_Turnips.RequiredItems.Add("Turnip", 50, true);
-            OH_Turnips.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Turnips", "Turnip", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Yellow_Mushrooms = new("odinsnummies", "OH_Yellow_Mushrooms");
-            OH_Yellow_Mushrooms.RequiredItems.Add("MushroomYellow", 50, true);
-            OH_Yellow_Mushrooms.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Yellow_Mushrooms", "MushroomYellow", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Thistle = new("odinsnummies", "OH_Thistle");
-            OH_Thistle.RequiredItems.Add("Thistle", 50, true);
-            OH_Thistle.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Thistle", "Thistle", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Dandelion = new("odinsnummies", "OH_Dandelion");
-            OH_Dandelion.RequiredItems.Add("Dandelion", 50, true);
-            OH_Dandelion.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Dandelion", "Dandelion", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Barley = new("odinsnummies", "OH_Barley");
-            OH_Barley.RequiredItems.Add("Barley", 50, true);
-            OH_Barley.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Barley", "Barley", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Flax = new("odinsnummies", "OH_Flax");
-            OH_Flax.RequiredItems.Add("Flax", 50, true);
-            OH_Flax.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Flax", "Flax", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Onions = new("odinsnummies", "OH_Onions");
-            OH_Onions.RequiredItems.Add("Onion", 50, true);
-            OH_Onions.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Onions", "Onion", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Egg_Basket = new("odinsnummies", "OH_Egg_Basket");
-            OH_Egg_Basket.RequiredItems.Add("ChickenEgg", 50, true);
-            OH_Egg_Basket.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Egg_Basket", "ChickenEgg", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_JotunPuffs_Basket = new("odinsnummies", "OH_JotunPuffs_Basket");
-            OH_JotunPuffs_Basket.RequiredItems.Add("MushroomJotunPuffs", 50, true);
-            OH_JotunPuffs_Basket.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_JotunPuffs_Basket", "MushroomJotunPuffs", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Magecap = new("odinsnummies", "OH_Magecap");
-            OH_Magecap.RequiredItems.Add("MushroomMagecap", 50, true);
-            OH_Magecap.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Magecap", "MushroomMagecap", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_RoyalJelly = new("odinsnummies", "OH_RoyalJelly");
-            OH_RoyalJelly.RequiredItems.Add("RoyalJelly", 50, true);
-            OH_RoyalJelly.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_RoyalJelly", "RoyalJelly", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Sap_Barrel = new("odinsnummies", "OH_Sap_Barrel");
-            OH_Sap_Barrel.RequiredItems.Add("Sap", 50, true);
-            OH_Sap_Barrel.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Sap_Barrel", "Sap", 10, true, BuildPieceCategory.Misc);
 
-            BuildPiece OH_Seedbag = new("odinsnummies", "OH_Seedbag");
-            OH_Seedbag.RequiredItems.Add("DeerHide", 5, true);
-            OH_Seedbag.Category.Set(BuildPieceCategory.Misc);
+            CreateBuildPiece(assetBundle, "OH_Seedbag", "DeerHide", 5, true, BuildPieceCategory.Misc);
 
+            // override the allowable items for OH_Seedbag since we want to it be seeds and not DeerHide
+            ContainerRestrictions["OH_Seedbag"] = new HashSet<string>()
+            {
+                "Acorn",
+                "AncientSeed",
+                "BeechSeeds",
+                "BirchSeeds",
+                "CarrotSeeds",
+                "OnionSeeds",
+                "TurnipSeeds",
+            };
+
+            // Set up restrictions for containers
+            RestrictContainers.Instance.SetContainerRestrictions(ContainerRestrictions);
 
             Assembly assembly = Assembly.GetExecutingAssembly();
             Harmony harmony = new(ModGUID);
             harmony.PatchAll(assembly);
-
-
         }
 
+        /// <summary>
+        ///     Method to create food barrels and add values to container restrictions
+        /// </summary>
+        /// <param name="assetBundleFileName"></param>
+        /// <param name="prefabName"></param>
+        /// <param name="requiredItem"></param>
+        /// <param name="itemAmount"></param>
+        /// <param name="recover"></param>
+        /// <param name="category"></param>
+        private static void CreateBuildPiece(
+            string assetBundleFileName,
+            string prefabName,
+            string requiredItem,
+            int itemAmount,
+            bool recover,
+            BuildPieceCategory category
+        )
+        {
+            BuildPiece buildPiece = new(assetBundleFileName, prefabName);
+            buildPiece.RequiredItems.Add(requiredItem, itemAmount, recover);
+            buildPiece.Category.Set(category);
+            BuildPieces.Add(prefabName, buildPiece); // keep a reference to BuildPiece in case PieceManager needs it
 
+            // add tokenized version of prefabName, which is also the name for
+            // it's container component also add the allowable item for this container
+            ContainerRestrictions.Add($"${prefabName}", new HashSet<string>() { requiredItem });
+        }
     }
 }
