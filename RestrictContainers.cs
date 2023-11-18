@@ -12,25 +12,15 @@ namespace OdinsFoodBarrels
     internal class RestrictContainers
     {
         private static string? _targetContainer;
-        private static HashSet<string> _allowedItems;
+        private static HashSet<string>? _allowedItems;
         private static Dictionary<string, HashSet<string>> _allowedItemsByContainer = new();
 
-        private static RestrictContainers _instance;
+        private static RestrictContainers? _instance;
 
         /// <summary>
         ///     Singleton instance
         /// </summary>
-        public static RestrictContainers Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new RestrictContainers();
-                }
-                return _instance;
-            }
-        }
+        public static RestrictContainers Instance => _instance ??= new RestrictContainers();
 
         /// <summary>
         ///     Hide .ctor
