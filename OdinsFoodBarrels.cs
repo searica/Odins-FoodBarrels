@@ -22,8 +22,8 @@ namespace OdinsFoodBarrels
         internal const string HGUID = Author + "." + "OdinsFoodBarrels";
         internal const string HGUIDLower = "gravebear.odinsfoodbarrels";
         private const string ModGUID = "Harmony." + Author + "." + ModName;
-        private static string ConfigFileName = HGUIDLower + ".cfg";
-        private static string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
+        private static readonly string ConfigFileName = HGUIDLower + ".cfg";
+        private static readonly string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
         public static string ConnectionError = "";
 
         private static readonly ConfigSync configSync = new(ModName) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
