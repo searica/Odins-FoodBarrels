@@ -65,9 +65,9 @@ namespace OdinsFoodBarrels
         ///     so the entire method needs to be prevented from running to avoid items being lost when players
         ///     try to place items in containers that do not allow that type of item.
         /// </summary>
-        /// <param name="__0"></param>
-        /// <param name="__1"></param>
         /// <param name="__instance"></param>
+        /// <param name="fromInventory"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
         [HarmonyPrefix]
         [HarmonyPatch(nameof(Inventory.MoveItemToThis), new[] { typeof(Inventory), typeof(ItemDrop.ItemData) })]
