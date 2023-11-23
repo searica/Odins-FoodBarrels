@@ -11,6 +11,7 @@ namespace OdinsFoodBarrels
     [HarmonyPatch(typeof(Inventory))]
     internal class RestrictContainers
     {
+        private static string? _loadingContainer;
         private static string? _targetContainer;
         private static HashSet<string>? _allowedItems;
         private static Dictionary<string, HashSet<string>> _allowedItemsByContainer = new();
@@ -147,17 +148,25 @@ namespace OdinsFoodBarrels
         ///     try to place items in containers that do not allow that type of item.
         /// </summary>
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(Inventory), nameof(Inventory.MoveItemToThis), new[] { typeof(Inventory), typeof(ItemDrop.ItemData), typeof(int), typeof(int), typeof(int) })]
-        [HarmonyPriority(Priority.First)]
-        private static bool MoveItemToThisPrefix_2(Inventory __0, ItemDrop.ItemData __1, Inventory __instance)
+        [HarmonyPatch(nameof(Inventory.Load))]
+        private static void LoadPrefix(Inventory __instance)
         {
-            var fromInventory = __0;
-            var item = __1;
-            if (__instance == null || fromInventory == null || item == null) { return false; }
-            Log.LogDebug("MoveItemToThisPrefix");
-            Log.LogDebug($"Add to: {__instance.m_name}");
-            Log.LogDebug($"Item: {item.PrefabName()}");
-            return CanAddItem(__instance, item);
+            if (__instance == null) { return; }
+
+            Log.LogDebug($"Load prefix: {__instance.m_name}");
+
+            _loadingContainer = __instance.m_name;
+        }
+
+        /// <summary>
+        ///     Reset value for _loadingContainer so that restrictions are applied correctly.
+        /// </summary>
+        /// <param name="__instance"></param>
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(Inventory.Load))]
+        private static void LoadPostfix()
+        {
+            _loadingContainer = null;
         }
 
         // Dev Note: I don't actually think the MoveAll and RemoveItem patches are necessary
@@ -242,8 +251,24 @@ namespace OdinsFoodBarrels
         [HarmonyPatch(nameof(Inventory.RemoveOneItem), new[] { typeof(ItemDrop.ItemData) })]
         [HarmonyPriority(Priority.First)]
         private static bool RemoveOneItemPrefix(Inventory __instance, ItemDrop.ItemData item)
+            if (inventory.m_name == _loadingContainer)
         {
-            return ShouldRemoveItem(__instance, item);
+                return true;
+            }
+
+            if (IsRestrictedContainer(inventory.m_name, out HashSet<string> allowedItems))
+            {
+                var result = allowedItems.Contains(item.PrefabName());
+                if (!result)
+                {
+                    // Message player that item cannot be placed in container.
+                    var msg = $"{item.m_shared.m_name} cannnot be placed in {inventory.m_name}";
+                    Player.m_localPlayer?.Message(MessageHud.MessageType.Center, msg);
+                }
+                return result;
+            }
+
+            return true;
         }
 
         /// <summary>
