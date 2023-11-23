@@ -14,7 +14,7 @@ namespace OdinsFoodBarrels
     [BepInPlugin(HGUIDLower, ModName, ModVersion)]
     public class OdinsFoodBarrelsPlugin : BaseUnityPlugin
     {
-        public const string ModVersion = "1.0.15";
+        public const string ModVersion = "1.0.16";
         public const string ModName = "OdinsFoodBarrels";
         internal const string Author = "Gravebear";
         internal const string HGUID = Author + "." + "OdinsFoodBarrels";
