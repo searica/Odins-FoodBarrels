@@ -9,11 +9,9 @@ using ServerSync;
 using LocalizationManager;
 using BepInEx.Logging;
 
-namespace OdinsFoodBarrels
-{
+namespace OdinsFoodBarrels {
     [BepInPlugin(HGUIDLower, ModName, ModVersion)]
-    public class OdinsFoodBarrelsPlugin : BaseUnityPlugin
-    {
+    public class OdinsFoodBarrelsPlugin : BaseUnityPlugin {
         public const string ModVersion = "1.0.15";
         public const string ModName = "OdinsFoodBarrels";
         internal const string Author = "Gravebear";
@@ -28,8 +26,7 @@ namespace OdinsFoodBarrels
 
         private static ConfigEntry<Toggle> serverConfigLocked = null!;
 
-        private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description, bool synchronizedSetting = true)
-        {
+        private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description, bool synchronizedSetting = true) {
             ConfigEntry<T> configEntry = Config.Bind(group, name, value, description);
 
             SyncedConfigEntry<T> syncedConfigEntry = configSync.AddConfigEntry(configEntry);
@@ -40,8 +37,7 @@ namespace OdinsFoodBarrels
 
         private ConfigEntry<T> config<T>(string group, string name, T value, string description, bool synchronizedSetting = true) => config(group, name, value, new ConfigDescription(description), synchronizedSetting);
 
-        private enum Toggle
-        {
+        private enum Toggle {
             On = 1,
             Off = 0
         }
@@ -56,8 +52,7 @@ namespace OdinsFoodBarrels
         internal static Localization english = null!;
 
 
-        private void Awake()
-        {
+        private void Awake() {
             Localizer.Load();
 
             CreateBuildPiece(assetBundle, "OH_Raspberries", "Raspberry", 10, true, BuildPieceCategory.Misc);
@@ -115,7 +110,7 @@ namespace OdinsFoodBarrels
             };
 
             // Set up restrictions for containers
-            RestrictContainers.Instance.SetContainerRestrictions(ContainerRestrictions);
+            RestrictContainers.SetContainerRestrictions(ContainerRestrictions);
 
             Assembly assembly = Assembly.GetExecutingAssembly();
             Harmony harmony = new(ModGUID);
@@ -138,8 +133,7 @@ namespace OdinsFoodBarrels
             int itemAmount,
             bool recover,
             BuildPieceCategory category
-        )
-        {
+        ) {
             BuildPiece buildPiece = new(assetBundleFileName, prefabName);
             buildPiece.RequiredItems.Add(requiredItem, itemAmount, recover);
             buildPiece.Category.Set(category);

@@ -93,7 +93,7 @@ namespace OdinsFoodBarrels {
         /// <returns></returns>
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Inventory), nameof(Inventory.MoveItemToThis), new[] { typeof(Inventory), typeof(ItemDrop.ItemData) })]
-        [HarmonyPatch(typeof(Inventory), typeof(Inventory), nameof(Inventory.MoveItemToThis), new[] { typeof(Inventory), typeof(ItemDrop.ItemData), typeof(int), typeof(int), typeof(int) })]
+        [HarmonyPatch(typeof(Inventory), nameof(Inventory.MoveItemToThis), new[] { typeof(Inventory), typeof(ItemDrop.ItemData), typeof(int), typeof(int), typeof(int) })]
         [HarmonyPriority(Priority.First)]
         private static bool MoveItemToThisPrefix_1(Inventory __instance, Inventory fromInventory, ItemDrop.ItemData item) {
             if (__instance == null || fromInventory == null || item == null) {
