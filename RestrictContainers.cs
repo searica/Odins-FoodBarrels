@@ -2,15 +2,13 @@
 using HarmonyLib;
 using static OdinsFoodBarrels.OdinsFoodBarrelsPlugin;
 
-namespace OdinsFoodBarrels
-{
+namespace OdinsFoodBarrels {
     /// <summary>
     ///     Class to patch Valheim inventory methods so that the specified
     ///     containers can only contain items of a single type.
     /// </summary>
-    [HarmonyPatch(typeof(Inventory))]
-    internal static class RestrictContainers
-    {
+    [HarmonyPatch]
+    internal static class RestrictContainers {
         private static string? _loadingContainer;
         private static string? _targetContainer;
         private static HashSet<string>? _allowedItems;
@@ -20,8 +18,7 @@ namespace OdinsFoodBarrels
         ///     Set which containers to restrict and which item is allowed to be placed in each one.
         /// </summary>
         /// <param name="allowedItemByContainer"></param>
-        public static void SetContainerRestrictions(Dictionary<string, HashSet<string>> allowedItemByContainer)
-        {
+        public static void SetContainerRestrictions(Dictionary<string, HashSet<string>> allowedItemByContainer) {
             _allowedItemsByContainer = allowedItemByContainer;
         }
 
@@ -31,9 +28,35 @@ namespace OdinsFoodBarrels
         /// <param name="containerName"></param>
         /// <param name="allowedItem"></param>
         /// <returns></returns>
-        public static bool IsRestrictedContainer(string containerName, out HashSet<string> allowedItems)
-        {
+        public static bool IsRestrictedContainer(string containerName, out HashSet<string> allowedItems) {
             return _allowedItemsByContainer.TryGetValue(containerName, out allowedItems);
+        }
+
+        /// <summary>
+        ///     Checks if the item being dropped into the inventory is allowed to be placed in it and checks
+        ///     if the item that would be swapped into the fromInventory is allowed to be placed in it.
+        /// </summary>
+        /// <param name="__instance"></param>
+        /// <param name="fromInventory"></param>
+        /// <param name="item"></param>
+        /// <param name="pos"></param>
+        /// <returns></returns>
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(InventoryGrid), nameof(InventoryGrid.DropItem))]
+        private static bool DropItemPrefix(InventoryGrid __instance, Inventory fromInventory, ItemDrop.ItemData item, Vector2i pos) {
+
+            // Return early if item can't be dropped into inventory
+            if (!CanAddItem(__instance.m_inventory, item)) {
+                return false;
+            }
+
+            // Check if item being swapped can be placed in fromInventory
+            ItemDrop.ItemData itemAt = __instance.m_inventory.GetItemAt(pos.x, pos.y);
+            if (itemAt != null) {
+                return CanAddItem(fromInventory, itemAt);
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -46,13 +69,11 @@ namespace OdinsFoodBarrels
         /// <param name="__result"></param>
         /// <returns></returns>
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(Inventory.AddItem), new[] { typeof(ItemDrop.ItemData) })]
-        [HarmonyPatch(nameof(Inventory.AddItem), new[] { typeof(ItemDrop.ItemData), typeof(int), typeof(int), typeof(int) })]
+        [HarmonyPatch(typeof(Inventory), nameof(Inventory.AddItem), new[] { typeof(ItemDrop.ItemData) })]
+        [HarmonyPatch(typeof(Inventory), nameof(Inventory.AddItem), new[] { typeof(ItemDrop.ItemData), typeof(int), typeof(int), typeof(int) })]
         [HarmonyPriority(Priority.First)]
-        private static bool AddItemPrefix(Inventory __instance, ItemDrop.ItemData item, ref bool __result)
-        {
-            if (!CanAddItem(__instance, item))
-            {
+        private static bool AddItemPrefix(Inventory __instance, ItemDrop.ItemData item, ref bool __result) {
+            if (!CanAddItem(__instance, item)) {
                 __result = false;
                 return __result;
             }
@@ -71,12 +92,13 @@ namespace OdinsFoodBarrels
         /// <param name="item"></param>
         /// <returns></returns>
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(Inventory.MoveItemToThis), new[] { typeof(Inventory), typeof(ItemDrop.ItemData) })]
-        [HarmonyPatch(typeof(Inventory), nameof(Inventory.MoveItemToThis), new[] { typeof(Inventory), typeof(ItemDrop.ItemData), typeof(int), typeof(int), typeof(int) })]
+        [HarmonyPatch(typeof(Inventory), nameof(Inventory.MoveItemToThis), new[] { typeof(Inventory), typeof(ItemDrop.ItemData) })]
+        [HarmonyPatch(typeof(Inventory), typeof(Inventory), nameof(Inventory.MoveItemToThis), new[] { typeof(Inventory), typeof(ItemDrop.ItemData), typeof(int), typeof(int), typeof(int) })]
         [HarmonyPriority(Priority.First)]
-        private static bool MoveItemToThisPrefix_1(Inventory __instance, Inventory fromInventory, ItemDrop.ItemData item)
-        {
-            if (__instance == null || fromInventory == null || item == null) { return false; }
+        private static bool MoveItemToThisPrefix_1(Inventory __instance, Inventory fromInventory, ItemDrop.ItemData item) {
+            if (__instance == null || fromInventory == null || item == null) {
+                return false;
+            }
 
             Log.LogDebug("MoveItemToThisPrefix");
             Log.LogDebug($"Add to: {__instance.m_name}");
@@ -95,10 +117,11 @@ namespace OdinsFoodBarrels
         /// </summary>
         /// <param name="__instance"></param>
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(Inventory.Load))]
-        private static void LoadPrefix(Inventory __instance)
-        {
-            if (__instance == null) { return; }
+        [HarmonyPatch(typeof(Inventory), nameof(Inventory.Load))]
+        private static void LoadPrefix(Inventory __instance) {
+            if (__instance == null) {
+                return;
+            }
 
             Log.LogDebug($"Load prefix: {__instance.m_name}");
 
@@ -110,9 +133,8 @@ namespace OdinsFoodBarrels
         /// </summary>
         /// <param name="__instance"></param>
         [HarmonyPostfix]
-        [HarmonyPatch(nameof(Inventory.Load))]
-        private static void LoadPostfix()
-        {
+        [HarmonyPatch(typeof(Inventory), nameof(Inventory.Load))]
+        private static void LoadPostfix() {
             _loadingContainer = null;
         }
 
@@ -130,15 +152,15 @@ namespace OdinsFoodBarrels
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Inventory), nameof(Inventory.MoveAll), new[] { typeof(Inventory) })]
         [HarmonyPriority(Priority.First)]
-        private static void MoveAllPrefix(Inventory __instance, Inventory fromInventory)
-        {
-            if (__instance == null || fromInventory == null) { return; }
+        private static void MoveAllPrefix(Inventory __instance, Inventory fromInventory) {
+            if (__instance == null || fromInventory == null) {
+                return;
+            }
 
             Log.LogDebug("MoveAllPrefix");
             Log.LogDebug($"Move to: {__instance.m_name}");
 
-            if (IsRestrictedContainer(__instance.m_name, out HashSet<string> allowedItems))
-            {
+            if (IsRestrictedContainer(__instance.m_name, out HashSet<string> allowedItems)) {
                 _targetContainer = __instance.m_name;
                 _allowedItems = allowedItems;
             }
@@ -150,8 +172,7 @@ namespace OdinsFoodBarrels
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Inventory), nameof(Inventory.MoveAll), new[] { typeof(Inventory) })]
         [HarmonyPriority(Priority.First)]
-        private static void MoveAllPostfix()
-        {
+        private static void MoveAllPostfix() {
             _targetContainer = null;
             _allowedItems = null;
         }
@@ -165,11 +186,10 @@ namespace OdinsFoodBarrels
         /// <param name="item"></param>
         /// <returns></returns>
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(Inventory.RemoveItem), new[] { typeof(ItemDrop.ItemData) })]
-        [HarmonyPatch(nameof(Inventory.RemoveItem), new[] { typeof(ItemDrop.ItemData), typeof(int) })]
+        [HarmonyPatch(typeof(Inventory), nameof(Inventory.RemoveItem), new[] { typeof(ItemDrop.ItemData) })]
+        [HarmonyPatch(typeof(Inventory), nameof(Inventory.RemoveItem), new[] { typeof(ItemDrop.ItemData), typeof(int) })]
         [HarmonyPriority(Priority.First)]
-        private static bool RemoveItemPrefix(Inventory __instance, ItemDrop.ItemData item)
-        {
+        private static bool RemoveItemPrefix(Inventory __instance, ItemDrop.ItemData item) {
             return ShouldRemoveItem(__instance, item);
         }
 
@@ -182,10 +202,9 @@ namespace OdinsFoodBarrels
         /// <param name="item"></param>
         /// <returns></returns>
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(Inventory.RemoveOneItem), new[] { typeof(ItemDrop.ItemData) })]
+        [HarmonyPatch(typeof(Inventory), nameof(Inventory.RemoveOneItem), new[] { typeof(ItemDrop.ItemData) })]
         [HarmonyPriority(Priority.First)]
-        private static bool RemoveOneItemPrefix(Inventory __instance, ItemDrop.ItemData item)
-        {
+        private static bool RemoveOneItemPrefix(Inventory __instance, ItemDrop.ItemData item) {
             return ShouldRemoveItem(__instance, item);
         }
 
@@ -197,23 +216,21 @@ namespace OdinsFoodBarrels
         /// <param name="inventory"></param>
         /// <param name="item"></param>
         /// <returns></returns>
-        private static bool CanAddItem(Inventory inventory, ItemDrop.ItemData item)
-        {
-            if (inventory == null || item == null) { return false; }
+        private static bool CanAddItem(Inventory inventory, ItemDrop.ItemData item) {
+            if (inventory == null || item == null) {
+                return false;
+            }
 
             // Return early if this check is being called while loading a container.
             // Don't want to delete "non-allowed" items that were put in the container
             // while the restrictions were disabled.
-            if (inventory.m_name == _loadingContainer)
-            {
+            if (inventory.m_name == _loadingContainer) {
                 return true;
             }
 
-            if (IsRestrictedContainer(inventory.m_name, out HashSet<string> allowedItems))
-            {
+            if (IsRestrictedContainer(inventory.m_name, out HashSet<string> allowedItems)) {
                 var result = allowedItems.Contains(item.PrefabName());
-                if (!result)
-                {
+                if (!result) {
                     // Message player that item cannot be placed in container.
                     var msg = $"{item.m_shared.m_name} cannnot be placed in {inventory.m_name}";
                     Player.m_localPlayer?.Message(MessageHud.MessageType.Center, msg);
@@ -233,11 +250,9 @@ namespace OdinsFoodBarrels
         /// <param name="__instance"></param>
         /// <param name="item"></param>
         /// <returns></returns>
-        private static bool ShouldRemoveItem(Inventory __instance, ItemDrop.ItemData item)
-        {
+        private static bool ShouldRemoveItem(Inventory __instance, ItemDrop.ItemData item) {
             // early return and block removal since it's null
-            if (__instance == null || item == null)
-            {
+            if (__instance == null || item == null) {
                 return false;
             }
 
@@ -248,8 +263,7 @@ namespace OdinsFoodBarrels
             Log.LogDebug($"Remove from: {__instance.m_name}");
             Log.LogDebug($"Item: {item.PrefabName()}");
 
-            if (wasAddedToDynamicPile && _allowedItems != null)
-            {
+            if (wasAddedToDynamicPile && _allowedItems != null) {
                 return _allowedItems.Contains(item.PrefabName());
             }
 
@@ -257,12 +271,9 @@ namespace OdinsFoodBarrels
         }
     }
 
-    internal static class InventoryHelper
-    {
-        public static string PrefabName(this ItemDrop.ItemData item)
-        {
-            if (item.m_dropPrefab)
-            {
+    internal static class InventoryHelper {
+        public static string PrefabName(this ItemDrop.ItemData item) {
+            if (item.m_dropPrefab) {
                 return item.m_dropPrefab.name;
             }
 
