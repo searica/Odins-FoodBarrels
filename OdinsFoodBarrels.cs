@@ -103,7 +103,7 @@ namespace OdinsFoodBarrels
             CreateBuildPiece(assetBundle, "OH_Seedbag", "DeerHide", 5, true, BuildPieceCategory.Misc);
 
             // override the allowable items for OH_Seedbag since we want to it be seeds and not DeerHide
-            ContainerRestrictions["OH_Seedbag"] = new HashSet<string>()
+            ContainerRestrictions["$OH_Seedbag"] = new HashSet<string>()
             {
                 "Acorn",
                 "AncientSeed",
