@@ -14,7 +14,7 @@ namespace OdinsFoodBarrels
     [BepInPlugin(HGUIDLower, ModName, ModVersion)]
     public class OdinsFoodBarrelsPlugin : BaseUnityPlugin
     {
-        public const string ModVersion = "1.0.16";
+        public const string ModVersion = "1.0.20";
         public const string ModName = "OdinsFoodBarrels";
         internal const string Author = "Gravebear";
         internal const string HGUID = Author + "." + "OdinsFoodBarrels";
@@ -115,7 +115,7 @@ namespace OdinsFoodBarrels
             };
 
             // Set up restrictions for containers
-            RestrictContainers.Instance.SetContainerRestrictions(ContainerRestrictions);
+            RestrictContainers.SetContainerRestrictions(ContainerRestrictions);
 
             Assembly assembly = Assembly.GetExecutingAssembly();
             Harmony harmony = new(ModGUID);
